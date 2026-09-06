@@ -1,4 +1,4 @@
-### fn λ → ÷ ≟ ←
+### fn λ → ÷ ≟ ← ⊗
 
 → and ← can now be used for assignment, not just `<-` and `->`.
 
@@ -6,8 +6,10 @@
 
 ÷ means division.
 
+⊗ means the Kronecker/tensor product. It matches R's existing `%x%` operator; `%o%` remains R's outer product.
 
-Existing R spelling remains available: `<-`, `<<-`, `->`, `->>`, `==`, and `function` still work.
+
+Existing R spelling remains available: `<-`, `<<-`, `->`, `->>`, `==`, `function`, and `%x%` still work.
 
 
 
@@ -24,7 +26,17 @@ The last line returns
 
 because ≟ tests equality.
 
+A matrix tensor product can be written directly:
 
+```r
+A ← matrix(c(1, 2,
+             3, 4), nrow = 2, byrow = TRUE)
+B ← matrix(c(0, 5,
+             6, 7), nrow = 2, byrow = TRUE)
+A ⊗ B
+```
+
+which produces the same 4 × 4 matrix as `A %x% B` and `kronecker(A, B)`.
 
 
 
@@ -37,6 +49,7 @@ because ≟ tests equality.
 | `left ≟ right` | test equality |
 | `fn(x) expression`, `λ(x) expression`, or `ƒ(x) expression` | construct a function |
 | `left ÷ right` | divide |
+| `left ⊗ right` | Kronecker/tensor product |
 
 
 
