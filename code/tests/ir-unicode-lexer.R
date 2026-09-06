@@ -21,7 +21,8 @@ if (!UTF8) {
     COMPOSE     <- intToUtf8(0x2218) # ∘
     EQUALITY    <- intToUtf8(0x225f) # ≟
     INVERTED_Q  <- intToUtf8(0x00bf) # ¿
-    GENERIC     <- intToUtf8(0x2297) # ⊗
+    TENSOR      <- intToUtf8(0x2297) # ⊗
+    GENERIC     <- intToUtf8(0x2299) # ⊙
 
     stopifnot(
         identical(PI, "π"),
@@ -36,7 +37,8 @@ if (!UTF8) {
         identical(COMPOSE, "∘"),
         identical(EQUALITY, "≟"),
         identical(INVERTED_Q, "¿"),
-        identical(GENERIC, "⊗")
+        identical(TENSOR, "⊗"),
+        identical(GENERIC, "⊙")
     )
 
     ## U+03C0 is not merely displayed as π here: make π a real function name
@@ -62,9 +64,30 @@ if (!UTF8) {
         identical(parse1(paste0("1 ", INVERTED_Q, "=? 1")), quote(1 == 1))
     )
 
-    ## Unreserved glyphs still use the broad generic infix path.  Define one
-    ## as an ordinary function, then prove the same glyph parses and evaluates
-    ## infix rather than being rejected merely because it is Unicode.
+    ## ⊗ is IR's Kronecker/tensor-product operator.  Exercise a real matrix
+    ## product rather than treating the glyph as an arbitrary infix placeholder.
+    A <- matrix(c(1, 2,
+                  3, 4), nrow = 2, byrow = TRUE)
+    B <- matrix(c(0, 5,
+                  6, 7), nrow = 2, byrow = TRUE)
+    expectedTensor <- matrix(c(0,  5,  0, 10,
+                               6,  7, 12, 14,
+                               0, 15,  0, 20,
+                              18, 21, 24, 28),
+                             nrow = 4, byrow = TRUE)
+    tensorCall <- parse1(paste("A", TENSOR, "B"))
+    assign("A", A, envir = syntaxEnv)
+    assign("B", B, envir = syntaxEnv)
+    stopifnot(
+        identical(as.character(tensorCall[[1L]]), TENSOR),
+        identical(eval(tensorCall, syntaxEnv), expectedTensor),
+        identical(A ⊗ B, expectedTensor),
+        identical(A ⊗ B, A %x% B),
+        identical(A ⊗ B, kronecker(A, B))
+    )
+
+    ## Unreserved glyphs still use the broad generic infix path.  Keep that
+    ## lexer test separate from ⊗ so the tensor glyph has mathematical meaning.
     eval(parse1(paste0(GENERIC, " ", LEFT, " ", LAMBDA,
                        "(a, b) a + b")), syntaxEnv)
     genericCall <- parse1(paste("2", GENERIC, "3"))
