@@ -4,13 +4,16 @@ on:
   push:
     branches:
       - equality-glyph-aliases
+      - tensor-product-glyph
   pull_request:
     paths:
       - code/src/main/gram.c
       - code/src/main/gram.y
       - code/src/include/Rinlinedfuns.h
+      - code/src/library/base/R/kronecker.R
       - code/tests/reg-encodings.R
       - code/tests/ir-unicode-lexer.R
+      - tensor-product-example.R
       - .github/workflows/lexer.yml
 
 jobs:
@@ -46,3 +49,6 @@ jobs:
 
       - name: Test Unicode lexer priority
         run: build/bin/R --vanilla < code/tests/ir-unicode-lexer.R
+
+      - name: Test tensor-product example
+        run: build/bin/R --vanilla < tensor-product-example.R
